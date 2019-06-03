@@ -62,7 +62,7 @@ spec:
     spec:
       containers:
       - name: rsvpd-db
-        image: mongo:3.3
+        image: mongo:3.4
         env:
         - name: MONGODB_DATABASE
           value: rsvpdata
