@@ -37,13 +37,13 @@ metadata:
   labels:
     app: rsvp
 spec:
-  type: NodePort
   ports:
   - port: 80
     targetPort: web-port
     protocol: TCP
   selector:
     app: rsvp
+  type: LoadBalancer
 
 ---
 apiVersion: apps/v1
