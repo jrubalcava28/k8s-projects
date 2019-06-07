@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: argo
+  generateName: example-gathering-backend--
+spec:
+  entrypoint: cicd
+  volumes:
+  - name: docker-config
+  arguments:
+    parameters:
+    - name: repo
+      value: https://github.com/jrubalcava28/k8s-projects.git
+    - name: revision
+      value: master
+    - name: image-name-backend
+      value: docker-registry.k8s.bouweceunen.com/crypto-gathering/crypto-gathering-backend
+  templates:
+  - name: cicd
+    steps:
+      - - name: checkout
+          template: checkout
+      - - name: build-push-docker
+          template: build-push-docker
+          arguments:
+            artifacts:
+            - name: git-repo
+              from: "{{steps.checkout.outputs.artifacts.source}}"
+            parameters:
+            - name: image-tag
+              value: "{{steps.checkout.outputs.parameters.tag}}"
+      - - name: run-tests
+          template: run-tests
+          arguments:
+            artifacts:
+            - name: git-repo
+              from: "{{steps.checkout.outputs.artifacts.source}}"
+            parameters:
+            - name: image-tag
+              value: "{{steps.checkout.outputs.parameters.tag}}"
+      - - name: deploy-kubernetes
+          template: deploy-kubernetes
+          arguments:
+            artifacts:
+            - name: git-repo
+              from: "{{steps.checkout.outputs.artifacts.source}}"
+            parameters:
+            - name: image-tag
+              value: "{{steps.checkout.outputs.parameters.tag}}"
